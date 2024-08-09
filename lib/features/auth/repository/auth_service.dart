@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 // authServiceProvider is a provider that return AuthService
-final authServiceProvider = Provider((ref) =>
-    AuthService(auth: FirebaseAuth.instance, googleSignIn: GoogleSignIn()));
+final authServiceProvider = Provider((ref) => AuthService(
+      auth: FirebaseAuth.instance,
+      googleSignIn: GoogleSignIn(),
+    ));
 
 // class AuthService is a class that return signInWithGoogle method
 class AuthService {
