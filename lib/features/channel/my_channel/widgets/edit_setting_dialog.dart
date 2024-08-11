@@ -33,6 +33,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       content: SizedBox(
         height: 50,
         child: TextField(
+          
           controller: controller,
           decoration: const InputDecoration(
             border: OutlineInputBorder(
@@ -45,14 +46,19 @@ class _SettingsDialogState extends State<SettingsDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
           child: const Text(
             "CANCEL",
             style: TextStyle(color: Colors.black),
           ),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            widget.onSave!(controller.text);
+            Navigator.of(context).pop();
+          },
           child: const Text(
             "SAVE",
             style: TextStyle(color: Colors.black),
