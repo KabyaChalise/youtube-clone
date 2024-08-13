@@ -62,7 +62,7 @@ class MyApp extends ConsumerWidget {
                         ConnectionState.waiting) {
                       return Loader();
                     } else {
-                      return VideoDetailsPage();
+                      return HomePage();
                     }
                   });
             }

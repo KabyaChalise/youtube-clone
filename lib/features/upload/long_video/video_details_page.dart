@@ -1,26 +1,32 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_clone/cores/methods.dart';
+import 'package:youtube_clone/features/upload/long_video/video_repostitory.dart';
 
-class VideoDetailsPage extends StatefulWidget {
-  const VideoDetailsPage({super.key});
+class VideoDetailsPage extends ConsumerStatefulWidget {
+  final File? video;
+  const VideoDetailsPage(  {super.key, this.video});
 
   @override
-  State<VideoDetailsPage> createState() => _VideoDetailsPageState();
+  ConsumerState<VideoDetailsPage> createState() => _VideoDetailsPageState();
 }
 
-class _VideoDetailsPageState extends State<VideoDetailsPage> {
+class _VideoDetailsPageState extends ConsumerState<VideoDetailsPage> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   bool isThumbnailSelected = false;
   String randomNumber = const Uuid().v4();
+  String videoId = const Uuid().v4();
   File? image;
   @override
   Widget build(BuildContext context) {
@@ -120,9 +126,23 @@ class _VideoDetailsPageState extends State<VideoDetailsPage> {
                         color: Colors.green,
                       ),
                       child: TextButton(
-                        onPressed: () {
+                        onPressed: () async{
                           // publish video
-                          String thumbnail = putFileInStorage(image!, randomNumber, 'thumbnail');
+                          String thumbnail =
+                             await putFileInStorage(image, randomNumber, 'image');
+                          String videoUrl = await putFileInStorage(widget.video, randomNumber, 'video');
+                          
+                          ref.watch(longVideoProvider).uploadVideoToFirestore(
+                                videoUrl: videoUrl,
+                                thumbnailUrl: thumbnail,
+                                title: titleController.text,
+                                datePublished: DateTime.now(),
+                                views: 0,
+                                videoId: videoId,
+                                userId: FirebaseAuth.instance.currentUser!.uid,
+                                likes: [],
+                                types: 'video',
+                              );
                         },
                         child: const Text(
                           'Publish',
