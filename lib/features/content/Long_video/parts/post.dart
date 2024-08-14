@@ -1,15 +1,80 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/features/auth/model/user_model.dart';
+import 'package:youtube_clone/features/auth/provider/user_provider.dart';
+import 'package:youtube_clone/features/content/Long_video/parts/video.dart';
 
-class Post extends StatelessWidget {
-  const Post({super.key});
+import 'package:youtube_clone/features/upload/long_video/video_model.dart';
+
+class Post extends ConsumerWidget {
+  final VideoModel video;
+  const Post({
+    Key? key,
+    required this.video,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<UserModel> userModel =
+        ref.watch(anyUserProvider(video.userId));
+    final user = userModel.whenData((user) => user);
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const Video()));
+      },
       child: Column(
         children: [
-          CachedNetworkImage(imageUrl: 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')
+          CachedNetworkImage(
+              imageUrl: video.thumbnailUrl,
+              height: 250,
+              fit: BoxFit.cover,
+              width: double.infinity),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8, left: 4),
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage:
+                      CachedNetworkImageProvider(user.value?.profilePic ?? ''),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                video.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            ],
+          ),
+          Padding(
+            padding:
+                EdgeInsets.only(left: MediaQuery.sizeOf(context).width * 0.14),
+            child: Row(
+              children: [
+                Text(
+                  user.value?.username ?? '',
+                  style: const TextStyle(color: Colors.blueAccent),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    video.views == 0 ? '0 views' : '${video.views} views',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+                const Text(
+                  'a moment ago',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
