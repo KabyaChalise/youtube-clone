@@ -23,7 +23,7 @@ class Post extends ConsumerWidget {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const Video()));
+            context, MaterialPageRoute(builder: (context) =>  Video(videoModel: video,)));
       },
       child: Column(
         children: [
