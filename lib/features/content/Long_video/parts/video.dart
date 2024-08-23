@@ -13,6 +13,7 @@ import 'package:youtube_clone/features/auth/model/user_model.dart';
 import 'package:youtube_clone/features/auth/provider/user_provider.dart';
 import 'package:youtube_clone/features/content/Long_video/parts/post.dart';
 import 'package:youtube_clone/features/content/Long_video/widgets/video_externel_buttons.dart';
+import 'package:youtube_clone/features/content/comment/comment_sheet.dart';
 import 'package:youtube_clone/features/upload/long_video/video_model.dart';
 
 // ignore: must_be_immutable
@@ -330,6 +331,25 @@ class _VideoState extends ConsumerState<Video> {
                 ),
               ),
             ),
+            // comment box
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(context: context, builder: (context) => CommentSheet(
+                    video: widget.videoModel!,
+                  ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  height: 45,
+                  width: 200,
+                ),
+              ),
+            ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Expanded(
               child: StreamBuilder(
@@ -345,15 +365,17 @@ class _VideoState extends ConsumerState<Video> {
                     return Loader();
                   }
                   final videoMap = snapshot.data!.docs;
-                  final videos = videoMap.map((video) => VideoModel.fromMap(video.data())).toList();
+                  final videos = videoMap
+                      .map((video) => VideoModel.fromMap(video.data()))
+                      .toList();
                   return SizedBox(
                     height: 400,
                     child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: videos.length,
-                      itemBuilder: (context, index) {
-                      return Post(video: videos[index]);
-                    }),
+                        scrollDirection: Axis.vertical,
+                        itemCount: videos.length,
+                        itemBuilder: (context, index) {
+                          return Post(video: videos[index]);
+                        }),
                   );
                 }),
               ),
