@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:youtube_clone/features/upload/long_video/video_details_page.dart';
+import 'package:youtube_clone/features/upload/short_video/pages/short_video_screen.dart';
 
 void showErrorSnackBar(String message, context) =>
     ScaffoldMessenger.of(context).showSnackBar(
@@ -35,6 +37,28 @@ Future<File?> pickVideo(context) async {
   // convert the file to a file object
   File video = File(file.path);
   Navigator.push(context, MaterialPageRoute(builder: (context) => VideoDetailsPage(video: video)));
+
+
+}
+// pickvideo is a function that open the gallery and return the video
+Future<File?> pickShortVideo(context) async {
+  // opens the gallery
+  XFile? file = await ImagePicker().pickVideo(source: ImageSource.gallery);
+
+  // Check if the file is null
+  if (file == null) {
+    Fluttertoast.showToast(
+      msg: 'No video selected',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+    );
+    return null;
+  }
+  // convert the file to a file object
+  File video = File(file.path);
+  Navigator.push(context, MaterialPageRoute(builder: (context) => ShortVideoScreen(shortVideo: video)));
 
 
 }

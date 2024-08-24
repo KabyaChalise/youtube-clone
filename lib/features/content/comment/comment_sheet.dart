@@ -39,44 +39,6 @@ class _CommentSheetState extends ConsumerState<CommentSheet> {
               IconButton(onPressed: () {}, icon: const Icon(Icons.close))
             ],
           ),
-          Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                    'Rememeber to keep comments respectful and follow our community guidelines.'),
-              )),
-          Expanded(
-            child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('comments')
-                    .where('videoId', isEqualTo: widget.video.videoId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const ErrorPage();
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Loader();
-                  }
-                  final commentsMap = snapshot.data!.docs;
-                  final List<CommentsModel> comments = commentsMap
-                      .map((comment) => CommentsModel.fromMap(comment.data()))
-                      .toList();
-                  return ListView.builder(
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      return  CommentTile(
-                        comments: comments[index],
-                      );
-                    },
-                  );
-                }),
-          ),
-          const Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -118,7 +80,46 @@ class _CommentSheetState extends ConsumerState<CommentSheet> {
                     size: 35,
                   ))
             ],
-          )
+          ),
+          Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                    'Rememeber to keep comments respectful and follow our community guidelines.'),
+              )),
+          Expanded(
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('comments')
+                    .where('videoId', isEqualTo: widget.video.videoId)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const ErrorPage();
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Loader();
+                  }
+                  final commentsMap = snapshot.data!.docs;
+                  final List<CommentsModel> comments = commentsMap
+                      .map((comment) => CommentsModel.fromMap(comment.data()))
+                      .toList();
+                  return ListView.builder(
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      return  CommentTile(
+                        comments: comments[index],
+                      );
+                    },
+                  );
+                }),
+          ),
+          // const Spacer(),
+          
         ],
       ),
     );

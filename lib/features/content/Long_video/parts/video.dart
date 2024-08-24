@@ -71,6 +71,7 @@ class _VideoState extends ConsumerState<Video> {
         ref.watch(anyUserProvider(widget.videoModel!.userId));
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.grey,
         elevation: 0,
         bottom: PreferredSize(
