@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/cores/widgets/flat_button.dart';
 import 'package:youtube_clone/features/upload/short_video/repository/short_video_repository.dart';
+import 'package:youtube_clone/home_page.dart';
 
 class ShortVideoDetails extends ConsumerStatefulWidget {
   final File video;
@@ -58,11 +59,15 @@ class _ShortVideoDetailsState extends ConsumerState<ShortVideoDetails> {
                 child: FlatButton(
                   text: 'Publish',
                   onPressed: () async {
-                    await ref.watch(shortVideoProvider).addShortVideo(
+                    await ref.read(shortVideoProvider).addShortVideo(
                           caption: captionController.text,
                           video: widget.video.path,
                           datePublished: date,
                         );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()));
                   },
                   colour: Colors.green,
                 ),

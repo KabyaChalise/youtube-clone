@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';

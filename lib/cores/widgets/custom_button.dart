@@ -30,7 +30,7 @@ class CustomButton extends StatelessWidget {
           onTap: onTap,
           child: Icon(
             iconData,
-            size: 19,
+            size: 24,
           ),
         ),
       ),

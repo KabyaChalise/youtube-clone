@@ -12,10 +12,11 @@ import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_clone/cores/methods.dart';
 import 'package:youtube_clone/features/upload/long_video/video_repostitory.dart';
+import 'package:youtube_clone/home_page.dart';
 
 class VideoDetailsPage extends ConsumerStatefulWidget {
   final File? video;
-  const VideoDetailsPage(  {super.key, this.video});
+  const VideoDetailsPage({super.key, this.video});
 
   @override
   ConsumerState<VideoDetailsPage> createState() => _VideoDetailsPageState();
@@ -126,13 +127,14 @@ class _VideoDetailsPageState extends ConsumerState<VideoDetailsPage> {
                         color: Colors.green,
                       ),
                       child: TextButton(
-                        onPressed: () async{
+                        onPressed: () async {
                           // publish video
-                          String thumbnail =
-                             await putFileInStorage(image, randomNumber, 'image');
-                          String videoUrl = await putFileInStorage(widget.video, randomNumber, 'video');
-                          
-                          ref.watch(longVideoProvider).uploadVideoToFirestore(
+                          String thumbnail = await putFileInStorage(
+                              image, randomNumber, 'image');
+                          String videoUrl = await putFileInStorage(
+                              widget.video, randomNumber, 'video');
+
+                          ref.read(longVideoProvider).uploadVideoToFirestore(
                                 videoUrl: videoUrl,
                                 thumbnailUrl: thumbnail,
                                 title: titleController.text,
@@ -143,6 +145,10 @@ class _VideoDetailsPageState extends ConsumerState<VideoDetailsPage> {
                                 likes: [],
                                 types: 'video',
                               );
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()));
                         },
                         child: const Text(
                           'Publish',
