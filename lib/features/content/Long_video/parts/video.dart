@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -11,10 +12,15 @@ import 'package:youtube_clone/cores/screens/loader.dart';
 import 'package:youtube_clone/cores/widgets/flat_button.dart';
 import 'package:youtube_clone/features/auth/model/user_model.dart';
 import 'package:youtube_clone/features/auth/provider/user_provider.dart';
+import 'package:youtube_clone/features/channel/users_channel/subscribe_repository.dart';
 import 'package:youtube_clone/features/content/Long_video/parts/post.dart';
 import 'package:youtube_clone/features/content/Long_video/widgets/video_externel_buttons.dart';
+import 'package:youtube_clone/features/content/Long_video/widgets/video_first_comment.dart';
+import 'package:youtube_clone/features/content/comment/comment_provider.dart';
 import 'package:youtube_clone/features/content/comment/comment_sheet.dart';
+import 'package:youtube_clone/features/upload/comments/comments_model.dart';
 import 'package:youtube_clone/features/upload/long_video/video_model.dart';
+import 'package:youtube_clone/features/upload/long_video/video_repostitory.dart';
 
 // ignore: must_be_immutable
 class Video extends ConsumerStatefulWidget {
@@ -63,6 +69,14 @@ class _VideoState extends ConsumerState<Video> {
     Duration position = _controller!.value.position;
     position = position + Duration(seconds: 1);
     _controller!.seekTo(position);
+  }
+
+  likedVideo() async {
+    await ref.watch(longVideoProvider).likedVideo(
+          likes: widget.videoModel!.likes,
+          videoId: widget.videoModel!.videoId,
+          currentUserId: FirebaseAuth.instance.currentUser!.uid,
+        );
   }
 
   @override
@@ -268,7 +282,14 @@ class _VideoState extends ConsumerState<Video> {
                       padding: const EdgeInsets.only(right: 6),
                       child: FlatButton(
                         text: "Subscribe",
-                        onPressed: () {},
+                        onPressed: ()async {
+                          //subscribe 
+                         await ref.watch(subscribeChannelProvider).subscribeChannel(
+                                channelId: user.value!.userId,
+                                currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                                subscriptions: user.value!.subscriptions,
+                              );
+                        },
                         colour: Colors.black,
                       ),
                     ),
@@ -296,12 +317,17 @@ class _VideoState extends ConsumerState<Video> {
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: likedVideo,
                             child: Icon(
                               Icons.thumb_up,
+                              color: widget.videoModel!.likes.contains(FirebaseAuth.instance.currentUser!.uid)
+                                  ? Colors.blue
+                                  : Colors.grey,
                               size: 15.5,
                             ),
                           ),
+                          const SizedBox(width: 7),
+                          Text(widget.videoModel!.likes.length.toString()),
                           const SizedBox(width: 15),
                           const Icon(
                             Icons.thumb_down,
@@ -337,17 +363,31 @@ class _VideoState extends ConsumerState<Video> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               child: GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(context: context, builder: (context) => CommentSheet(
-                    video: widget.videoModel!,
-                  ));
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) => CommentSheet(
+                            video: widget.videoModel!,
+                          ));
                 },
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(7),
                   ),
-                  height: 45,
+                  height: 70,
                   width: 200,
+                  child: Consumer(builder: (context, ref, child) {
+                    final AsyncValue<List<CommentsModel>> comments =
+                        ref.watch(commentsProvider(widget.videoModel!.videoId));
+
+                    if (comments.value == null) {
+                      return SizedBox();
+                    }
+                    return VideoFirstComment(
+                      comments: comments.value!,
+                      user: user.value!,
+                    );
+                  }),
                 ),
               ),
             ),

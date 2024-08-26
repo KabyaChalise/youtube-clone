@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/features/auth/model/user_model.dart';
@@ -23,7 +24,17 @@ class Post extends ConsumerWidget {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>  Video(videoModel: video,)));
+            context,
+            MaterialPageRoute(
+                builder: (context) => Video(
+                      videoModel: video,
+                    )));
+        FirebaseFirestore.instance
+            .collection('videos')
+            .doc(video.videoId)
+            .update({
+          'views': FieldValue.increment(1),
+        });
       },
       child: Column(
         children: [
